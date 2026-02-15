@@ -38,13 +38,11 @@ st.markdown("""
         border: none !important;
         border-radius: 15px !important;
         
-        /* TYPOGRAPHY */
         font-size: 22px !important; 
         text-align: left !important;
         white-space: pre-wrap !important;
         font-family: 'Helvetica', sans-serif !important;
         
-        /* SIZING & POSITIONING */
         width: 100% !important;
         min-height: 50vh !important;
         padding: 40px !important;
@@ -54,7 +52,6 @@ st.markdown("""
         box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
     }
 
-    /* HOVER for Big Boxes */
     div.stButton > button[kind="primary"]:hover {
         background-color: var(--text-mint) !important; 
         color: var(--text-dark) !important;            
@@ -74,15 +71,12 @@ st.markdown("""
         border: none !important;
         border-radius: 12px !important;
         
-        /* THE BLACK BAT TRICK */
         color: transparent !important;  
         text-shadow: 0 0 0 var(--text-dark) !important; 
         
-        /* TYPOGRAPHY & SIZE */
         font-size: 50px !important;
         line-height: 50px !important;
         
-        /* SIZING - COMPACT BOX */
         height: auto !important;
         width: auto !important;
         padding: 10px 20px !important;
@@ -94,6 +88,30 @@ st.markdown("""
     div.stButton > button[kind="secondary"]:hover {
         transform: scale(1.1) !important; 
         background-color: #ffffff !important; 
+    }
+
+    /* =========================================
+       STYLE 3: THE SUBMIT BUTTON (Tertiary Buttons) 
+       ========================================= */
+    div.stButton > button[kind="tertiary"] {
+        background-color: var(--text-mint) !important;
+        color: var(--text-dark) !important;
+        border: none !important;
+        border-radius: 10px !important;
+        
+        font-size: 20px !important;
+        font-weight: bold !important;
+        
+        width: 100% !important;       /* Full Width */
+        height: auto !important;
+        padding: 15px !important;     /* Slimmer padding */
+        min-height: 0px !important;   /* Override big box height */
+        margin-top: 20px !important;
+    }
+    
+    div.stButton > button[kind="tertiary"]:hover {
+        background-color: #ffffff !important;
+        transform: scale(1.01) !important;
     }
 
     /* Headings */
@@ -116,7 +134,8 @@ st.markdown("""
         color: var(--text-mint);
         border: 2px solid var(--text-mint);
         border-radius: 10px;
-        min-height: 150px;
+        min-height: 200px;
+        font-size: 18px;
     }
 
     /* Hide default menu */
@@ -171,9 +190,10 @@ def ideas_page():
     with mid2:
         label = f"I NEED A HELPING HAND\n\n{lorem_short}"
         if st.button(label, type="primary"):
-            navigate_to('helping_hand')  # Changed navigation here!
+            navigate_to('helping_hand')
 
 def helping_hand_page():
+    # Top Bar: Back Button
     if st.button("🦇", type="secondary"):
         navigate_to('ideas')
     
@@ -189,53 +209,58 @@ def helping_hand_page():
     ]
     selected_placeholder = random.choice(placeholders)
 
-    # Layout: Toggle on Left, Input in Center
-    col_toggle, col_input = st.columns([1, 3])
-
-    with col_toggle:
-        st.markdown("<br><br>", unsafe_allow_html=True) # Spacer to align with text box
-        assisted_mode = st.toggle("Assisted Mode")
-
-    with col_input:
-        user_text = st.text_area("Your Idea", placeholder=selected_placeholder, label_visibility="collapsed")
-
-    # If Assisted Mode is ON, show the dropdowns
-    if assisted_mode:
-        st.markdown("---")
-        c1, c2, c3 = st.columns(3)
-        
-        with c1:
-            st.subheader("1. Project Type")
-            st.multiselect(
-                "What kind of project is it?",
-                ["Quick fix", "Big idea", "Else"],
-                label_visibility="collapsed"
-            )
-
-        with c2:
-            st.subheader("2. Resources Needed")
-            resources = [
-                "Hammer", "Workspace", "Drill", "3D Printer", 
-                "Paint", "Wood", "Metal", "Soldering Iron", 
-                "Sewing Machine", "Laptop"
-            ]
-            st.multiselect(
-                "What resources do you need?",
-                resources,
-                label_visibility="collapsed"
-            )
-
-        with c3:
-            st.subheader("3. Meeting Preference")
-            st.radio(
-                "Do you want to meet face to face?",
-                ["Yes", "No"],
-                label_visibility="collapsed"
-            )
-            
-    # Submit Button
+    # Toggle for Assisted Mode
+    assisted_mode = st.toggle("Assisted Mode")
     st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("Submit Request", type="primary"):
+
+    # LOGIC: 
+    # If Assisted Mode is OFF -> Show Text Box
+    # If Assisted Mode is ON -> Show 3 Dropdowns (Vertical)
+    
+    if not assisted_mode:
+        # Standard Text Area
+        st.text_area("Your Idea", placeholder=selected_placeholder, label_visibility="collapsed")
+    else:
+        # Vertical Layout (One below the other)
+        
+        # 1. Project Type
+        st.subheader("1. What kind of project is it?")
+        st.multiselect(
+            "Project Type",
+            ["Quick fix", "Big idea", "Else"],
+            label_visibility="collapsed",
+            key="type_select"
+        )
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # 2. Resources
+        st.subheader("2. What resources do you need?")
+        resources = [
+            "Hammer", "Workspace", "Drill", "3D Printer", 
+            "Paint", "Wood", "Metal", "Soldering Iron", 
+            "Sewing Machine", "Laptop"
+        ]
+        st.multiselect(
+            "Resources",
+            resources,
+            label_visibility="collapsed",
+            key="resource_select"
+        )
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # 3. Meeting Preference
+        st.subheader("3. Do you want to meet face to face?")
+        st.radio(
+            "Meeting Preference",
+            ["Yes", "No"],
+            label_visibility="collapsed",
+            key="meeting_select"
+        )
+
+    # Submit Button (Always visible at bottom)
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    # We use type="tertiary" to trigger the slimmer, horizontal style
+    if st.button("Submit Request", type="tertiary"):
         st.toast("Request Submitted Successfully!")
 
 def how_it_works_page():

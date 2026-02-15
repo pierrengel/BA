@@ -11,154 +11,158 @@ def navigate_to(page_name):
     st.session_state.page = page_name
     st.rerun()
 
-# --- 2. CUSTOM CSS (White, Dark Blue & Mint) ---
+# --- 2. CUSTOM CSS ---
 st.markdown("""
     <style>
-    /* Global Color Variables */
+    /* Global Variables */
     :root {
-        --main-bg-color: #ffffff;      /* White Background */
-        --box-color: #0d1b2a;          /* Dark Blue for the Boxes */
-        --text-color-main: #0d1b2a;    /* Dark Blue for page text */
-        --text-color-box: #ffffff;     /* White text inside the boxes */
-        --accent-color: #41ead4;       /* Mint Green for borders/accents */
+        --app-bg: #1b263b;         /* Lighter Dark Blue (Background) */
+        --box-bg: #0d1b2a;         /* Deep Dark Blue (Box Normal) */
+        --text-mint: #41ead4;      /* Mint (Text Normal / Box Hover) */
+        --text-dark: #0d1b2a;      /* Deep Dark Blue (Text Hover) */
     }
 
     /* Main App Background */
     .stApp {
-        background-color: var(--main-bg-color);
-        color: var(--text-color-main);
+        background-color: var(--app-bg);
+        color: var(--text-mint);
     }
 
-    /* Custom "Box" Styling for Buttons */
+    /* BIG BOX BUTTON STYLING */
     div.stButton > button {
-        background-color: var(--box-color);
-        color: var(--text-color-box);
-        border: 2px solid var(--accent-color); /* Mint border */
+        background-color: var(--box-bg);
+        color: var(--text-mint);   /* Mint Text */
+        border: none;              /* NO BORDERS */
         border-radius: 15px;
-        padding: 40px 20px;
-        font-size: 24px;
-        font-weight: 600;
-        width: 100%;
-        height: 100%;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    /* Hover effect for the boxes */
-    div.stButton > button:hover {
-        background-color: var(--accent-color); /* Turn Mint on hover */
-        color: var(--box-color);               /* Text turns Dark Blue */
-        border-color: var(--box-color);
-        transform: translateY(-5px);
-        box-shadow: 0 10px 15px rgba(0,0,0,0.2);
-    }
-
-    /* Headings (H1, H2, H3) */
-    h1, h2, h3 {
-        color: var(--text-color-main) !important; /* Dark Blue Headings */
+        
+        /* TYPOGRAPHY */
+        font-size: 22px; 
+        text-align: left;
+        white-space: pre-wrap;     /* Allows subtitles on new lines */
         font-family: 'Helvetica', sans-serif;
+        
+        /* SIZING - LARGE */
+        width: 100%;
+        min-height: 50vh;          /* Takes up half the screen height */
+        padding: 40px;
+        
+        transition: all 0.2s ease-in-out;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* Soft shadow for depth */
+    }
+
+    /* HOVER EFFECT */
+    div.stButton > button:hover {
+        background-color: var(--text-mint); /* Box turns Mint */
+        color: var(--text-dark);            /* Text turns Dark Blue */
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.4);
     }
     
-    /* Paragraph text */
-    p {
-        color: var(--text-color-main);
+    /* Headings */
+    h1, h2, h3 {
+        color: var(--text-mint) !important;
+        font-family: 'Helvetica', sans-serif;
+    }
+
+    /* Normal text (outside buttons) */
+    p, li {
+        color: #e0e1dd; /* Off-white for readability on dark background */
         font-size: 1.1rem;
     }
 
-    /* Expander styling (for the FAQ section) */
+    /* Expander Styling (for How It Works) */
     .streamlit-expanderHeader {
-        background-color: #f0f2f6;
-        color: var(--text-color-main);
-        border-radius: 10px;
-        font-weight: bold;
+        background-color: var(--box-bg);
+        color: var(--text-mint);
+        border-radius: 5px;
     }
     
-    /* Hide default menu for cleaner look */
+    /* Hide default menu */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. PAGE FUNCTIONS ---
+# --- 3. TEXT PLACEHOLDERS ---
+lorem_short = "Short placeholder text to describe this section briefly."
+
+# --- 4. PAGE FUNCTIONS ---
 
 def home_page():
-    # Title in Dark Blue
-    st.markdown("<h1 style='text-align: center; font-size: 4rem; margin-bottom: 50px;'>ROBIN</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; font-size: 4rem; margin-bottom: 40px;'>ROBIN</h1>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        if st.button("Give us your Idea! 💡"):
+        # \n\n creates the spacing between Title and Subtitle inside the button
+        label = f"GIVE US YOUR IDEA\n\n{lorem_short}"
+        if st.button(label):
             navigate_to('ideas')
             
     with col2:
-        if st.button("How ROBIN works! ⚙️"):
+        label = f"HOW ROBIN WORKS\n\n{lorem_short}"
+        if st.button(label):
             navigate_to('how_it_works')
             
     with col3:
-        if st.button("Keep Track of Ideas! 🚀"):
+        label = f"KEEP TRACK OF SUCCESSFUL IDEAS\n\n{lorem_short}"
+        if st.button(label):
             navigate_to('success')
 
 def ideas_page():
-    # Simple Back button
-    if st.button("← Back to Home"):
+    # Back button is also styled big by default, we might want to make it smaller or leave it
+    # For now, it inherits the big style which looks modern.
+    if st.button("← BACK", key="back_btn"):
         navigate_to('home')
         
     st.markdown("---")
+    st.markdown("<h1 style='text-align: center; font-size: 3rem; margin-bottom: 60px;'>HOW CAN WE HELP YOU WITH YOUR PROJECT?</h1>", unsafe_allow_html=True)
     
-    st.markdown("<h1 style='text-align: center; font-size: 3.5rem; margin-bottom: 60px;'>How can we help you with your project?</h1>", unsafe_allow_html=True)
-    
-    _, mid1, mid2, _ = st.columns([1, 2, 2, 1])
+    # Using columns to center the two boxes
+    _, mid1, mid2, _ = st.columns([0.5, 2, 2, 0.5])
     
     with mid1:
-        if st.button("I need financial support! 💰"):
-            st.toast("Financial support selected!") 
+        label = f"I NEED FINANCIAL SUPPORT\n\n{lorem_short}"
+        if st.button(label):
+            st.toast("Financial Support Selected")
             
     with mid2:
-        if st.button("I need a helping hand! 🤝"):
-            st.toast("Volunteer support selected!") 
+        label = f"I NEED A HELPING HAND\n\n{lorem_short}"
+        if st.button(label):
+            st.toast("Volunteer Support Selected")
 
 def how_it_works_page():
-    if st.button("← Back to Home"):
+    if st.button("← BACK", key="back_btn"):
         navigate_to('home')
     
     st.markdown("---")
-    st.title("How ROBIN Works")
+    st.title("HOW ROBIN WORKS")
     
+    # Placeholders: 3 Titles, 3 Subtitles, 3 Collapsible Texts
     sections = [
-        {
-            "title": "1. Submission Phase",
-            "subtitle": "Getting your thoughts on paper",
-            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-        },
-        {
-            "title": "2. The Review Process",
-            "subtitle": "Quality assurance and feasibility",
-            "text": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-        },
-        {
-            "title": "3. Execution & Launch",
-            "subtitle": "Bringing the dream to reality",
-            "text": "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium."
-        }
+        {"title": "1. SUBMISSION", "sub": "Initial concept phase"},
+        {"title": "2. REVIEW", "sub": "Feasibility check"},
+        {"title": "3. LAUNCH", "sub": "Go to market"}
     ]
     
-    for section in sections:
-        st.header(section["title"])
-        st.subheader(section["subtitle"])
-        with st.expander(f"Read more about {section['title']}"):
-            st.write(section["text"])
+    gibberish = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+    
+    for s in sections:
+        st.subheader(s["title"])
+        st.markdown(f"*{s['sub']}*") # Subtitle in italics
+        with st.expander("Read details"):
+            st.write(gibberish)
         st.markdown("<br>", unsafe_allow_html=True)
 
 def success_page():
-    if st.button("← Back to Home"):
+    if st.button("← BACK", key="back_btn"):
         navigate_to('home')
         
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("<h1 style='text-align: center; font-size: 5rem;'>Our Success Stories</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; font-size: 5rem;'>OUR SUCCESS STORIES</h1>", unsafe_allow_html=True)
 
-# --- 4. MAIN APP CONTROLLER ---
+# --- 5. MAIN CONTROLLER ---
 
 if st.session_state.page == 'home':
     home_page()

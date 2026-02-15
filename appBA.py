@@ -1,4 +1,5 @@
 import streamlit as st
+import random
 
 # --- 1. CONFIGURATION & STATE MANAGEMENT ---
 st.set_page_config(page_title="ROBIN", layout="wide", page_icon="🐦")
@@ -74,11 +75,11 @@ st.markdown("""
         border-radius: 12px !important;
         
         /* THE BLACK BAT TRICK */
-        color: transparent !important;  /* Hide the standard brown emoji color */
-        text-shadow: 0 0 0 var(--text-dark) !important; /* Create a silhouette in Dark Blue */
+        color: transparent !important;  
+        text-shadow: 0 0 0 var(--text-dark) !important; 
         
         /* TYPOGRAPHY & SIZE */
-        font-size: 50px !important; /* Much Bigger! */
+        font-size: 50px !important;
         line-height: 50px !important;
         
         /* SIZING - COMPACT BOX */
@@ -92,7 +93,7 @@ st.markdown("""
     
     div.stButton > button[kind="secondary"]:hover {
         transform: scale(1.1) !important; 
-        background-color: #ffffff !important; /* White hover for feedback */
+        background-color: #ffffff !important; 
     }
 
     /* Headings */
@@ -101,10 +102,21 @@ st.markdown("""
         font-family: 'Helvetica', sans-serif;
     }
     
-    /* Text styling */
-    p, li {
-        color: #e0e1dd;
-        font-size: 1.1rem;
+    /* Text input styling */
+    .stTextInput > div > div > input {
+        background-color: var(--box-bg);
+        color: var(--text-mint);
+        border: 2px solid var(--text-mint);
+        border-radius: 10px;
+    }
+    
+    /* Text Area Styling */
+    .stTextArea > div > div > textarea {
+        background-color: var(--box-bg);
+        color: var(--text-mint);
+        border: 2px solid var(--text-mint);
+        border-radius: 10px;
+        min-height: 150px;
     }
 
     /* Hide default menu */
@@ -142,7 +154,6 @@ def home_page():
             navigate_to('success')
 
 def ideas_page():
-    # Back button with type="secondary"
     if st.button("🦇", type="secondary"):
         navigate_to('home')
         
@@ -160,7 +171,72 @@ def ideas_page():
     with mid2:
         label = f"I NEED A HELPING HAND\n\n{lorem_short}"
         if st.button(label, type="primary"):
-            st.toast("Volunteer Support Selected")
+            navigate_to('helping_hand')  # Changed navigation here!
+
+def helping_hand_page():
+    if st.button("🦇", type="secondary"):
+        navigate_to('ideas')
+    
+    st.markdown("---")
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; margin-bottom: 40px;'>Describe your project</h1>", unsafe_allow_html=True)
+
+    # Pick a random placeholder
+    placeholders = [
+        "Let's hear your idea!",
+        "Let's find you your best help!",
+        "Let's find you your partner!"
+    ]
+    selected_placeholder = random.choice(placeholders)
+
+    # Layout: Toggle on Left, Input in Center
+    col_toggle, col_input = st.columns([1, 3])
+
+    with col_toggle:
+        st.markdown("<br><br>", unsafe_allow_html=True) # Spacer to align with text box
+        assisted_mode = st.toggle("Assisted Mode")
+
+    with col_input:
+        user_text = st.text_area("Your Idea", placeholder=selected_placeholder, label_visibility="collapsed")
+
+    # If Assisted Mode is ON, show the dropdowns
+    if assisted_mode:
+        st.markdown("---")
+        c1, c2, c3 = st.columns(3)
+        
+        with c1:
+            st.subheader("1. Project Type")
+            st.multiselect(
+                "What kind of project is it?",
+                ["Quick fix", "Big idea", "Else"],
+                label_visibility="collapsed"
+            )
+
+        with c2:
+            st.subheader("2. Resources Needed")
+            resources = [
+                "Hammer", "Workspace", "Drill", "3D Printer", 
+                "Paint", "Wood", "Metal", "Soldering Iron", 
+                "Sewing Machine", "Laptop"
+            ]
+            st.multiselect(
+                "What resources do you need?",
+                resources,
+                label_visibility="collapsed"
+            )
+
+        with c3:
+            st.subheader("3. Meeting Preference")
+            st.radio(
+                "Do you want to meet face to face?",
+                ["Yes", "No"],
+                label_visibility="collapsed"
+            )
+            
+    # Submit Button
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("Submit Request", type="primary"):
+        st.toast("Request Submitted Successfully!")
 
 def how_it_works_page():
     if st.button("🦇", type="secondary"):
@@ -197,6 +273,8 @@ if st.session_state.page == 'home':
     home_page()
 elif st.session_state.page == 'ideas':
     ideas_page()
+elif st.session_state.page == 'helping_hand':
+    helping_hand_page()
 elif st.session_state.page == 'how_it_works':
     how_it_works_page()
 elif st.session_state.page == 'success':

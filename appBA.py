@@ -45,7 +45,7 @@ st.markdown("""
         
         /* SIZING & POSITIONING */
         width: 100% !important;
-        min-height: 50vh !important; /* The Big Height */
+        min-height: 50vh !important;
         padding: 40px !important;
         margin-top: 20px !important;
         
@@ -61,7 +61,6 @@ st.markdown("""
         box-shadow: 0 10px 20px rgba(0,0,0,0.4) !important;
     }
     
-    /* Make the text paragraphs inside big buttons handle hover color too */
     div.stButton > button[kind="primary"]:hover p {
         color: var(--text-dark) !important;
     }
@@ -70,27 +69,30 @@ st.markdown("""
        STYLE 2: THE BACK BUTTON (Secondary Buttons) 
        ========================================= */
     div.stButton > button[kind="secondary"] {
-        background-color: var(--text-mint) !important; /* Mint Background */
-        color: var(--text-dark) !important;            /* Dark Blue Text/Emoji */
+        background-color: var(--text-mint) !important; 
         border: none !important;
-        border-radius: 10px !important;
+        border-radius: 12px !important;
         
-        /* TYPOGRAPHY */
-        font-size: 24px !important; /* Large Emoji size */
-        font-weight: bold !important;
+        /* THE BLACK BAT TRICK */
+        color: transparent !important;  /* Hide the standard brown emoji color */
+        text-shadow: 0 0 0 var(--text-dark) !important; /* Create a silhouette in Dark Blue */
         
-        /* SIZING - SMALL AND COMPACT */
+        /* TYPOGRAPHY & SIZE */
+        font-size: 50px !important; /* Much Bigger! */
+        line-height: 50px !important;
+        
+        /* SIZING - COMPACT BOX */
         height: auto !important;
         width: auto !important;
         padding: 10px 20px !important;
-        min-height: 0px !important; /* Override the big height */
+        min-height: 0px !important;
         
         transition: transform 0.2s ease !important;
     }
     
     div.stButton > button[kind="secondary"]:hover {
-        transform: scale(1.1) !important; /* Slight grow effect */
-        background-color: #fff !important; /* White on hover for feedback */
+        transform: scale(1.1) !important; 
+        background-color: #ffffff !important; /* White hover for feedback */
     }
 
     /* Headings */
@@ -126,7 +128,6 @@ def home_page():
     
     with col1:
         label = f"GIVE US YOUR IDEA\n\n{lorem_short}"
-        # We add type="primary" to apply the BIG BOX style
         if st.button(label, type="primary"):
             navigate_to('ideas')
             
@@ -141,7 +142,7 @@ def home_page():
             navigate_to('success')
 
 def ideas_page():
-    # Back button is type="secondary" (default), so it gets the BAT style
+    # Back button with type="secondary"
     if st.button("🦇", type="secondary"):
         navigate_to('home')
         
@@ -153,13 +154,11 @@ def ideas_page():
     
     with mid1:
         label = f"I NEED FINANCIAL SUPPORT\n\n{lorem_short}"
-        # These are big boxes, so type="primary"
         if st.button(label, type="primary"):
             st.toast("Financial Support Selected")
             
     with mid2:
         label = f"I NEED A HELPING HAND\n\n{lorem_short}"
-        # These are big boxes, so type="primary"
         if st.button(label, type="primary"):
             st.toast("Volunteer Support Selected")
 

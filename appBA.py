@@ -17,9 +17,10 @@ def navigate_to(page_name):
 def toggle_selection(key):
     st.session_state.selections[key] = not st.session_state.selections.get(key, False)
 
-# --- 2. CUSTOM CSS (STRICT SCOPING) ---
+# --- 2. CUSTOM CSS ---
 st.markdown("""
     <style>
+    /* Global Variables */
     :root {
         --app-bg: #1b263b;
         --box-bg: #0d1b2a;
@@ -33,20 +34,20 @@ st.markdown("""
     }
 
     /* ============================================================
-       1. BASE BUTTON STYLES (Applies to ALL buttons)
-       Colors Only - No Sizes!
+       1. GLOBAL BUTTON COLORS (Applies to ALL buttons)
+       This ensures the toggle logic (Blue <-> Mint) works everywhere.
        ============================================================ */
     
     /* DEFAULT STATE (Secondary) -> Dark Blue Box, Mint Text */
     div.stButton > button[kind="secondary"] {
         background-color: var(--box-bg) !important;
         color: var(--text-mint) !important;
-        border: 2px solid var(--box-bg) !important; /* Invisible border */
+        border: 2px solid var(--box-bg) !important; 
         border-radius: 15px !important;
         transition: all 0.2s ease-in-out !important;
     }
 
-    /* SELECTED STATE (Primary) -> Mint Box, Dark Blue Text */
+    /* SELECTED/ACTIVE STATE (Primary) -> Mint Box, Dark Blue Text */
     div.stButton > button[kind="primary"] {
         background-color: var(--text-mint) !important;
         color: var(--text-dark) !important;
@@ -54,37 +55,36 @@ st.markdown("""
         border-radius: 15px !important;
     }
 
-    /* HOVER STATE (For Secondary) -> Turns Mint like Primary */
+    /* HOVER STATE (For Secondary) -> Turns Mint on Hover */
     div.stButton > button[kind="secondary"]:hover {
         background-color: var(--text-mint) !important;
         color: var(--text-dark) !important;
         transform: translateY(-2px);
     }
-    
-    /* Text color override on hover */
     div.stButton > button[kind="secondary"]:hover p {
         color: var(--text-dark) !important;
     }
 
     /* ============================================================
-       2. SCOPED: BIG CARDS (.big-card)
-       Only these buttons get the 50vh height.
+       2. LAYOUT WRAPPER: BIG BOXES (.big-box)
+       Forces buttons inside this wrapper to be HUGE (50vh).
        ============================================================ */
-    div.big-card div.stButton > button {
-        min-height: 50vh !important;
+    div.big-box button {
+        min-height: 50vh !important; /* The Big Height */
+        height: 50vh !important;
         width: 100% !important;
         font-size: 24px !important;
         text-align: left !important;
         padding: 40px !important;
-        white-space: pre-wrap !important;
+        white-space: pre-wrap !important; /* Allows text wrapping */
     }
 
     /* ============================================================
-       3. SCOPED: SMALL CARDS (.small-card)
-       These buttons stay small and grid-like.
+       3. LAYOUT WRAPPER: SMALL GRID (.small-grid)
+       Forces buttons inside this wrapper to be SMALL (Normal).
        ============================================================ */
-    div.small-card div.stButton > button {
-        min-height: auto !important;
+    div.small-grid button {
+        min-height: 0px !important;
         height: auto !important;
         width: 100% !important;
         font-size: 16px !important;
@@ -92,26 +92,31 @@ st.markdown("""
         padding: 15px 10px !important;
         margin-top: 5px !important;
     }
+    
+    /* Ensure small grid borders look right */
+    div.small-grid button[kind="secondary"] {
+        border: 2px solid var(--text-mint) !important; /* Visible Mint Border for small boxes */
+    }
 
     /* ============================================================
-       4. SCOPED: BAT NAVIGATION (.bat-nav)
-       Specific styles for the back button
+       4. LAYOUT WRAPPER: BAT NAVIGATION (.bat-nav)
+       Specific styles for the Back Button.
        ============================================================ */
-    div.bat-nav div.stButton > button {
-        background-color: var(--text-mint) !important; /* Mint Bg */
+    div.bat-nav button {
+        background-color: var(--text-mint) !important; /* Mint Background */
         width: auto !important;
         height: auto !important;
         min-height: 0px !important;
         padding: 5px 20px !important;
         
-        /* Black Bat Trick */
+        /* The Black Bat Trick */
         color: transparent !important;
-        text-shadow: 0 0 0 var(--text-dark) !important; /* Dark Blue Bat */
+        text-shadow: 0 0 0 var(--text-dark) !important; /* Dark Blue Shadow = Black Bat */
         font-size: 40px !important;
         line-height: 40px !important;
     }
     
-    div.bat-nav div.stButton > button:hover {
+    div.bat-nav button:hover {
         background-color: #ffffff !important;
         transform: scale(1.1) !important;
     }
@@ -143,24 +148,25 @@ st.markdown("""
 
 # --- 3. HELPER FUNCTIONS ---
 
-def render_big_button(label, key):
-    """Renders a button inside the 'big-card' wrapper."""
-    st.markdown('<div class="big-card">', unsafe_allow_html=True)
-    # We use 'secondary' as default so it's Dark Blue, turns Mint on hover.
-    clicked = st.button(label, key=key, type="secondary")
-    st.markdown('</div>', unsafe_allow_html=True)
+def big_card_button(col, label, key):
+    """Renders a Big Box button inside a column."""
+    with col:
+        st.markdown('<div class="big-box">', unsafe_allow_html=True)
+        # Type is secondary (Dark Blue) by default
+        clicked = st.button(label, key=key, type="secondary")
+        st.markdown('</div>', unsafe_allow_html=True)
     return clicked
 
-def render_bat_button(key):
-    """Renders the back button inside 'bat-nav' wrapper."""
+def bat_button(key):
+    """Renders the Bat Back Button."""
     st.markdown('<div class="bat-nav">', unsafe_allow_html=True)
     clicked = st.button("🦇", key=key)
     st.markdown('</div>', unsafe_allow_html=True)
     return clicked
 
 def create_selection_grid(options, category_key):
-    """Renders small toggle buttons inside 'small-card' wrapper."""
-    st.markdown('<div class="small-card">', unsafe_allow_html=True)
+    """Renders the grid of small toggle boxes."""
+    st.markdown('<div class="small-grid">', unsafe_allow_html=True)
     
     cols_per_row = 4
     rows = [options[i:i + cols_per_row] for i in range(0, len(options), cols_per_row)]
@@ -171,9 +177,10 @@ def create_selection_grid(options, category_key):
             full_key = f"{category_key}_{option}"
             is_selected = st.session_state.selections.get(full_key, False)
             
-            # Logic: 
-            # Not Selected -> 'secondary' (Dark Blue)
-            # Selected -> 'primary' (Mint)
+            # LOGIC: 
+            # If selected -> Type Primary (Mint)
+            # If not selected -> Type Secondary (Dark Blue)
+            # This allows the "Click to turn back" behavior.
             btn_type = "primary" if is_selected else "secondary"
             
             with cols[idx]:
@@ -193,18 +200,18 @@ def home_page():
     
     col1, col2, col3 = st.columns(3)
     
-    with col1:
-        if render_big_button(f"GIVE US YOUR IDEA\n\n{lorem_short}", "home_1"):
-            navigate_to('ideas')
-    with col2:
-        if render_big_button(f"HOW ROBIN WORKS\n\n{lorem_short}", "home_2"):
-            navigate_to('how_it_works')
-    with col3:
-        if render_big_button(f"KEEP TRACK OF SUCCESSFUL IDEAS\n\n{lorem_short}", "home_3"):
-            navigate_to('success')
+    # We use the helper function to ensure the DIV wrapper applies correctly inside the column
+    if big_card_button(col1, f"GIVE US YOUR IDEA\n\n{lorem_short}", "home_1"):
+        navigate_to('ideas')
+        
+    if big_card_button(col2, f"HOW ROBIN WORKS\n\n{lorem_short}", "home_2"):
+        navigate_to('how_it_works')
+        
+    if big_card_button(col3, f"KEEP TRACK OF SUCCESSFUL IDEAS\n\n{lorem_short}", "home_3"):
+        navigate_to('success')
 
 def ideas_page():
-    if render_bat_button("back_ideas"):
+    if bat_button("back_ideas"):
         navigate_to('home')
         
     st.markdown("---")
@@ -213,15 +220,14 @@ def ideas_page():
     
     _, mid1, mid2, _ = st.columns([0.5, 2, 2, 0.5])
     
-    with mid1:
-        if render_big_button(f"I NEED FINANCIAL SUPPORT\n\n{lorem_short}", "idea_money"):
-            st.toast("Financial Support Selected")
-    with mid2:
-        if render_big_button(f"I NEED A HELPING HAND\n\n{lorem_short}", "idea_help"):
-            navigate_to('helping_hand')
+    if big_card_button(mid1, f"I NEED FINANCIAL SUPPORT\n\n{lorem_short}", "idea_money"):
+        st.toast("Financial Support Selected")
+        
+    if big_card_button(mid2, f"I NEED A HELPING HAND\n\n{lorem_short}", "idea_help"):
+        navigate_to('helping_hand')
 
 def helping_hand_page():
-    if render_bat_button("back_help"):
+    if bat_button("back_help"):
         navigate_to('ideas')
     
     st.markdown("---")
@@ -261,14 +267,14 @@ def helping_hand_page():
 
     st.markdown("<br><br>", unsafe_allow_html=True)
     
-    # Submit button - using a manual wrapper for the 'slim' look
-    st.markdown('<div class="small-card">', unsafe_allow_html=True)
+    # Submit button - Reuse small grid styling so it isn't huge
+    st.markdown('<div class="small-grid">', unsafe_allow_html=True)
     if st.button("Submit Request", type="primary", use_container_width=True):
         st.toast("Request Submitted Successfully!")
     st.markdown('</div>', unsafe_allow_html=True)
 
 def how_it_works_page():
-    if render_bat_button("back_how"):
+    if bat_button("back_how"):
         navigate_to('home')
     
     st.markdown("---")
@@ -289,7 +295,7 @@ def how_it_works_page():
         st.markdown("<br>", unsafe_allow_html=True)
 
 def success_page():
-    if render_bat_button("back_success"):
+    if bat_button("back_success"):
         navigate_to('home')
         
     st.markdown("<br><br>", unsafe_allow_html=True)

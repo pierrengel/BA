@@ -18,7 +18,7 @@ st.markdown("""
     :root {
         --app-bg: #1b263b;         /* Lighter Dark Blue (Background) */
         --box-bg: #0d1b2a;         /* Deep Dark Blue (Box Normal) */
-        --text-mint: #41ead4;      /* Mint (Text Normal / Box Hover) */
+        --text-mint: #76c8b9;      /* DIMMER Mint (Text Normal / Box Hover) */
         --text-dark: #0d1b2a;      /* Deep Dark Blue (Text Hover) */
     }
 
@@ -41,10 +41,11 @@ st.markdown("""
         white-space: pre-wrap;     /* Allows subtitles on new lines */
         font-family: 'Helvetica', sans-serif;
         
-        /* SIZING - LARGE */
+        /* SIZING & POSITIONING */
         width: 100%;
         min-height: 50vh;          /* Takes up half the screen height */
         padding: 40px;
+        margin-top: 20px;          /* Adds a little space at the top of the button */
         
         transition: all 0.2s ease-in-out;
         box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* Soft shadow for depth */
@@ -52,10 +53,11 @@ st.markdown("""
 
     /* HOVER EFFECT */
     div.stButton > button:hover {
-        background-color: var(--text-mint); /* Box turns Mint */
-        color: var(--text-dark);            /* Text turns Dark Blue */
+        background-color: var(--text-mint) !important; /* Box turns Dimmer Mint */
+        color: var(--text-dark) !important;            /* Text turns Dark Blue (Forced) */
         transform: translateY(-5px);
         box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        border: none;
     }
     
     /* Headings */
@@ -90,7 +92,13 @@ lorem_short = "Short placeholder text to describe this section briefly."
 # --- 4. PAGE FUNCTIONS ---
 
 def home_page():
-    st.markdown("<h1 style='text-align: center; font-size: 4rem; margin-bottom: 40px;'>ROBIN</h1>", unsafe_allow_html=True)
+    # Spacer to lower the content
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    
+    st.markdown("<h1 style='text-align: center; font-size: 4rem; margin-bottom: 20px;'>ROBIN</h1>", unsafe_allow_html=True)
+    
+    # Another spacer to push boxes down further
+    st.markdown("<br>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
     
@@ -111,15 +119,13 @@ def home_page():
             navigate_to('success')
 
 def ideas_page():
-    # Back button is also styled big by default, we might want to make it smaller or leave it
-    # For now, it inherits the big style which looks modern.
     if st.button("← BACK", key="back_btn"):
         navigate_to('home')
         
     st.markdown("---")
+    st.markdown("<br>", unsafe_allow_html=True) # Spacer
     st.markdown("<h1 style='text-align: center; font-size: 3rem; margin-bottom: 60px;'>HOW CAN WE HELP YOU WITH YOUR PROJECT?</h1>", unsafe_allow_html=True)
     
-    # Using columns to center the two boxes
     _, mid1, mid2, _ = st.columns([0.5, 2, 2, 0.5])
     
     with mid1:

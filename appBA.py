@@ -34,20 +34,20 @@ st.markdown("""
     }
 
     /* ============================================================
-       1. GLOBAL BUTTON COLORS (Applies to ALL buttons)
-       This ensures the toggle logic (Blue <-> Mint) works everywhere.
+       1. COLOR LOGIC (APPLIES TO ALL BUTTONS)
+       We ONLY define colors here. NO sizes.
        ============================================================ */
     
-    /* DEFAULT STATE (Secondary) -> Dark Blue Box, Mint Text */
+    /* SECONDARY (Default): Dark Blue Box, Mint Text */
     div.stButton > button[kind="secondary"] {
         background-color: var(--box-bg) !important;
         color: var(--text-mint) !important;
-        border: 2px solid var(--box-bg) !important; 
+        border: 2px solid var(--box-bg) !important;
         border-radius: 15px !important;
         transition: all 0.2s ease-in-out !important;
     }
 
-    /* SELECTED/ACTIVE STATE (Primary) -> Mint Box, Dark Blue Text */
+    /* PRIMARY (Selected): Mint Box, Dark Blue Text */
     div.stButton > button[kind="primary"] {
         background-color: var(--text-mint) !important;
         color: var(--text-dark) !important;
@@ -55,74 +55,82 @@ st.markdown("""
         border-radius: 15px !important;
     }
 
-    /* HOVER STATE (For Secondary) -> Turns Mint on Hover */
+    /* HOVER (Secondary turns to Mint) */
     div.stButton > button[kind="secondary"]:hover {
         background-color: var(--text-mint) !important;
         color: var(--text-dark) !important;
-        transform: translateY(-2px);
+        border-color: var(--text-mint) !important;
     }
+    
+    /* Text color fix for hover */
     div.stButton > button[kind="secondary"]:hover p {
         color: var(--text-dark) !important;
     }
 
     /* ============================================================
-       2. LAYOUT WRAPPER: BIG BOXES (.big-box)
-       Forces buttons inside this wrapper to be HUGE (50vh).
+       2. SIZE LOGIC: BIG BOXES
+       Only buttons inside "big-box" get the 50vh height.
        ============================================================ */
-    div.big-box button {
-        min-height: 50vh !important; /* The Big Height */
+    div.big-box div.stButton > button {
+        min-height: 50vh !important;
         height: 50vh !important;
         width: 100% !important;
-        font-size: 24px !important;
+        font-size: 22px !important;
         text-align: left !important;
         padding: 40px !important;
-        white-space: pre-wrap !important; /* Allows text wrapping */
+        white-space: pre-wrap !important;
+        margin-top: 10px !important;
+    }
+    
+    /* Add specific hover lift for big boxes only */
+    div.big-box div.stButton > button:hover {
+        transform: translateY(-5px) !important;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.4) !important;
     }
 
     /* ============================================================
-       3. LAYOUT WRAPPER: SMALL GRID (.small-grid)
-       Forces buttons inside this wrapper to be SMALL (Normal).
+       3. SIZE LOGIC: SMALL GRID
+       Only buttons inside "small-grid" stay small.
        ============================================================ */
-    div.small-grid button {
-        min-height: 0px !important;
+    div.small-grid div.stButton > button {
+        min-height: auto !important;
         height: auto !important;
         width: 100% !important;
         font-size: 16px !important;
         text-align: center !important;
         padding: 15px 10px !important;
         margin-top: 5px !important;
+        white-space: normal !important;
     }
-    
-    /* Ensure small grid borders look right */
-    div.small-grid button[kind="secondary"] {
-        border: 2px solid var(--text-mint) !important; /* Visible Mint Border for small boxes */
+
+    /* Border tweak for small grid: Make borders visible */
+    div.small-grid div.stButton > button[kind="secondary"] {
+        border: 2px solid var(--text-mint) !important;
     }
 
     /* ============================================================
-       4. LAYOUT WRAPPER: BAT NAVIGATION (.bat-nav)
-       Specific styles for the Back Button.
+       4. NAVIGATION BAT
        ============================================================ */
-    div.bat-nav button {
-        background-color: var(--text-mint) !important; /* Mint Background */
+    div.bat-nav div.stButton > button {
+        background-color: var(--text-mint) !important;
         width: auto !important;
-        height: auto !important;
         min-height: 0px !important;
         padding: 5px 20px !important;
         
-        /* The Black Bat Trick */
+        /* Black Bat Trick */
         color: transparent !important;
-        text-shadow: 0 0 0 var(--text-dark) !important; /* Dark Blue Shadow = Black Bat */
+        text-shadow: 0 0 0 var(--text-dark) !important;
         font-size: 40px !important;
         line-height: 40px !important;
     }
     
-    div.bat-nav button:hover {
+    div.bat-nav div.stButton > button:hover {
         background-color: #ffffff !important;
         transform: scale(1.1) !important;
     }
 
     /* ============================================================
-       5. GENERAL UI (Inputs, Headings)
+       5. GENERAL UI
        ============================================================ */
     h1, h2, h3 { color: var(--text-mint) !important; font-family: 'Helvetica', sans-serif; }
     
@@ -151,8 +159,9 @@ st.markdown("""
 def big_card_button(col, label, key):
     """Renders a Big Box button inside a column."""
     with col:
+        # Wrap in big-box class to apply the 50vh height
         st.markdown('<div class="big-box">', unsafe_allow_html=True)
-        # Type is secondary (Dark Blue) by default
+        # Default is secondary (Dark Blue)
         clicked = st.button(label, key=key, type="secondary")
         st.markdown('</div>', unsafe_allow_html=True)
     return clicked
@@ -166,6 +175,7 @@ def bat_button(key):
 
 def create_selection_grid(options, category_key):
     """Renders the grid of small toggle boxes."""
+    # Wrap in small-grid class to keep them small
     st.markdown('<div class="small-grid">', unsafe_allow_html=True)
     
     cols_per_row = 4
@@ -177,10 +187,8 @@ def create_selection_grid(options, category_key):
             full_key = f"{category_key}_{option}"
             is_selected = st.session_state.selections.get(full_key, False)
             
-            # LOGIC: 
-            # If selected -> Type Primary (Mint)
-            # If not selected -> Type Secondary (Dark Blue)
-            # This allows the "Click to turn back" behavior.
+            # Logic: If selected -> Primary (Mint). If not -> Secondary (Dark Blue).
+            # Because we are inside .small-grid, changing to Primary WON'T make it huge.
             btn_type = "primary" if is_selected else "secondary"
             
             with cols[idx]:
@@ -200,7 +208,6 @@ def home_page():
     
     col1, col2, col3 = st.columns(3)
     
-    # We use the helper function to ensure the DIV wrapper applies correctly inside the column
     if big_card_button(col1, f"GIVE US YOUR IDEA\n\n{lorem_short}", "home_1"):
         navigate_to('ideas')
         

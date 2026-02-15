@@ -7,7 +7,6 @@ st.set_page_config(page_title="ROBIN", layout="wide", page_icon="🐦")
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
 
-# Initialize session state for selections
 if 'selections' not in st.session_state:
     st.session_state.selections = {}
 
@@ -36,24 +35,22 @@ st.markdown("""
 
     /* =========================================
        1. GLOBAL BIG BOXES (Home/Ideas)
-       This targets ALL Primary buttons by default
+       Target: Any 'primary' button. 
+       Effect: Makes it HUGE (50vh) and Mint on Hover.
        ========================================= */
     div.stButton > button[kind="primary"] {
         background-color: var(--box-bg) !important;
         color: var(--text-mint) !important;
         border: none !important;
         border-radius: 15px !important;
-        
         font-size: 22px !important; 
         text-align: left !important;
         white-space: pre-wrap !important;
         font-family: 'Helvetica', sans-serif !important;
-        
         width: 100% !important;
         min-height: 50vh !important; /* THE GIANT HEIGHT */
         padding: 40px !important;
         margin-top: 20px !important;
-        
         transition: all 0.2s ease-in-out !important;
         box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
     }
@@ -71,6 +68,7 @@ st.markdown("""
 
     /* =========================================
        2. BACK BUTTON (The Bat)
+       Target: Any 'secondary' button.
        ========================================= */
     div.stButton > button[kind="secondary"] {
         background-color: var(--text-mint) !important; 
@@ -116,11 +114,12 @@ st.markdown("""
 
     /* =========================================
        4. SMALL SELECTION GRID OVERRIDES
-       This fixes the "Giant Box" issue on selection
+       This targets buttons ONLY when they are inside the 'small-grid' div.
+       This overrides the global settings above.
        ========================================= */
     
-    /* Target ANY button inside the .small-grid wrapper */
-    div.small-grid button {
+    /* Reset size for ALL buttons in the grid */
+    div.small-grid div.stButton > button {
         min-height: 0px !important;  /* KILL THE GIANT HEIGHT */
         height: auto !important;
         padding: 15px !important;
@@ -131,26 +130,26 @@ st.markdown("""
         box-shadow: none !important;
     }
 
-    /* UNSELECTED STATE (Inside Grid) */
-    /* We use 'secondary' logic here but override appearance */
-    div.small-grid button[kind="secondary"] {
-        background-color: var(--box-bg) !important; /* Dark Blue */
-        color: var(--text-mint) !important;         /* Mint Text */
+    /* UNSELECTED (Dark Blue) */
+    /* We reuse 'secondary' type but override the Bat style */
+    div.small-grid div.stButton > button[kind="secondary"] {
+        background-color: var(--box-bg) !important; 
+        color: var(--text-mint) !important;         
         border: 2px solid var(--text-mint) !important;
         text-shadow: none !important; /* Remove Bat Shadow */
         border-radius: 8px !important;
     }
 
-    /* SELECTED STATE (Inside Grid) */
-    /* We use 'primary' logic here but override appearance */
-    div.small-grid button[kind="primary"] {
-        background-color: var(--text-mint) !important; /* Mint Background */
-        color: var(--text-dark) !important;            /* Dark Blue Text */
+    /* SELECTED (Mint) */
+    /* We reuse 'primary' type but override the Giant Box style */
+    div.small-grid div.stButton > button[kind="primary"] {
+        background-color: var(--text-mint) !important; 
+        color: var(--text-dark) !important;            
         border: 2px solid var(--text-mint) !important;
         border-radius: 8px !important;
     }
 
-    div.small-grid button:hover {
+    div.small-grid div.stButton > button:hover {
         transform: scale(1.02) !important;
         border-color: #ffffff !important;
     }
@@ -194,6 +193,7 @@ def create_selection_grid(options, category_key):
     Creates a grid of clickable toggle buttons wrapped in 'small-grid'
     to prevent them from becoming giant.
     """
+    # WRAPPER: This div class triggers the CSS overrides above
     st.markdown('<div class="small-grid">', unsafe_allow_html=True)
     
     cols_per_row = 4
@@ -205,7 +205,8 @@ def create_selection_grid(options, category_key):
             full_key = f"{category_key}_{option}"
             is_selected = st.session_state.selections.get(full_key, False)
             
-            # Primary = Selected (Mint), Secondary = Unselected (Dark Blue)
+            # Logic: If selected, be 'primary' (Mint). If not, be 'secondary' (Dark).
+            # The CSS 'small-grid' class ensures they stay small regardless of type.
             btn_type = "primary" if is_selected else "secondary"
             
             with cols[idx]:

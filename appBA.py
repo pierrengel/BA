@@ -18,7 +18,7 @@ st.markdown("""
     :root {
         --app-bg: #1b263b;         /* Lighter Dark Blue (Background) */
         --box-bg: #0d1b2a;         /* Deep Dark Blue (Box Normal) */
-        --text-mint: #76c8b9;      /* DIMMER Mint (Text Normal / Box Hover) */
+        --text-mint: #76c8b9;      /* Dimmer Mint (Text Normal / Box Hover) */
         --text-dark: #0d1b2a;      /* Deep Dark Blue (Text Hover) */
     }
 
@@ -28,36 +28,40 @@ st.markdown("""
         color: var(--text-mint);
     }
 
-    /* BIG BOX BUTTON STYLING */
+    /* BIG BOX BUTTON STYLING (Rest State) */
     div.stButton > button {
-        background-color: var(--box-bg);
-        color: var(--text-mint);   /* Mint Text */
-        border: none;              /* NO BORDERS */
-        border-radius: 15px;
+        background-color: var(--box-bg) !important;
+        color: var(--text-mint) !important;
+        border: none !important;
+        border-radius: 15px !important;
         
         /* TYPOGRAPHY */
-        font-size: 22px; 
-        text-align: left;
-        white-space: pre-wrap;     /* Allows subtitles on new lines */
-        font-family: 'Helvetica', sans-serif;
+        font-size: 22px !important; 
+        text-align: left !important;
+        white-space: pre-wrap !important;
+        font-family: 'Helvetica', sans-serif !important;
         
         /* SIZING & POSITIONING */
-        width: 100%;
-        min-height: 50vh;          /* Takes up half the screen height */
-        padding: 40px;
-        margin-top: 20px;          /* Adds a little space at the top of the button */
+        width: 100% !important;
+        min-height: 50vh !important;
+        padding: 40px !important;
+        margin-top: 20px !important;
         
-        transition: all 0.2s ease-in-out;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* Soft shadow for depth */
+        transition: all 0.2s ease-in-out !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
     }
 
-    /* HOVER EFFECT */
+    /* HOVER EFFECT - FORCE TEXT COLOR CHANGE */
     div.stButton > button:hover {
-        background-color: var(--text-mint) !important; /* Box turns Dimmer Mint */
-        color: var(--text-dark) !important;            /* Text turns Dark Blue (Forced) */
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-        border: none;
+        background-color: var(--text-mint) !important; /* Box becomes Mint */
+        color: var(--text-dark) !important;            /* Text becomes Dark Blue */
+        transform: translateY(-5px) !important;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.4) !important;
+    }
+    
+    /* Make the specific text inside the button inherit the hover color */
+    div.stButton > button:hover p {
+        color: var(--text-dark) !important;
     }
     
     /* Headings */
@@ -66,19 +70,6 @@ st.markdown("""
         font-family: 'Helvetica', sans-serif;
     }
 
-    /* Normal text (outside buttons) */
-    p, li {
-        color: #e0e1dd; /* Off-white for readability on dark background */
-        font-size: 1.1rem;
-    }
-
-    /* Expander Styling (for How It Works) */
-    .streamlit-expanderHeader {
-        background-color: var(--box-bg);
-        color: var(--text-mint);
-        border-radius: 5px;
-    }
-    
     /* Hide default menu */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
@@ -103,7 +94,6 @@ def home_page():
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        # \n\n creates the spacing between Title and Subtitle inside the button
         label = f"GIVE US YOUR IDEA\n\n{lorem_short}"
         if st.button(label):
             navigate_to('ideas')
@@ -123,7 +113,7 @@ def ideas_page():
         navigate_to('home')
         
     st.markdown("---")
-    st.markdown("<br>", unsafe_allow_html=True) # Spacer
+    st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("<h1 style='text-align: center; font-size: 3rem; margin-bottom: 60px;'>HOW CAN WE HELP YOU WITH YOUR PROJECT?</h1>", unsafe_allow_html=True)
     
     _, mid1, mid2, _ = st.columns([0.5, 2, 2, 0.5])
@@ -145,18 +135,17 @@ def how_it_works_page():
     st.markdown("---")
     st.title("HOW ROBIN WORKS")
     
-    # Placeholders: 3 Titles, 3 Subtitles, 3 Collapsible Texts
     sections = [
         {"title": "1. SUBMISSION", "sub": "Initial concept phase"},
         {"title": "2. REVIEW", "sub": "Feasibility check"},
         {"title": "3. LAUNCH", "sub": "Go to market"}
     ]
     
-    gibberish = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+    gibberish = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     
     for s in sections:
         st.subheader(s["title"])
-        st.markdown(f"*{s['sub']}*") # Subtitle in italics
+        st.markdown(f"*{s['sub']}*")
         with st.expander("Read details"):
             st.write(gibberish)
         st.markdown("<br>", unsafe_allow_html=True)

@@ -28,8 +28,10 @@ st.markdown("""
         color: var(--text-mint);
     }
 
-    /* BIG BOX BUTTON STYLING (Rest State) */
-    div.stButton > button {
+    /* =========================================
+       STYLE 1: THE BIG BOXES (Primary Buttons) 
+       ========================================= */
+    div.stButton > button[kind="primary"] {
         background-color: var(--box-bg) !important;
         color: var(--text-mint) !important;
         border: none !important;
@@ -43,7 +45,7 @@ st.markdown("""
         
         /* SIZING & POSITIONING */
         width: 100% !important;
-        min-height: 50vh !important;
+        min-height: 50vh !important; /* The Big Height */
         padding: 40px !important;
         margin-top: 20px !important;
         
@@ -51,23 +53,56 @@ st.markdown("""
         box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
     }
 
-    /* HOVER EFFECT - FORCE TEXT COLOR CHANGE */
-    div.stButton > button:hover {
-        background-color: var(--text-mint) !important; /* Box becomes Mint */
-        color: var(--text-dark) !important;            /* Text becomes Dark Blue */
+    /* HOVER for Big Boxes */
+    div.stButton > button[kind="primary"]:hover {
+        background-color: var(--text-mint) !important; 
+        color: var(--text-dark) !important;            
         transform: translateY(-5px) !important;
         box-shadow: 0 10px 20px rgba(0,0,0,0.4) !important;
     }
     
-    /* Make the specific text inside the button inherit the hover color */
-    div.stButton > button:hover p {
+    /* Make the text paragraphs inside big buttons handle hover color too */
+    div.stButton > button[kind="primary"]:hover p {
         color: var(--text-dark) !important;
     }
+
+    /* =========================================
+       STYLE 2: THE BACK BUTTON (Secondary Buttons) 
+       ========================================= */
+    div.stButton > button[kind="secondary"] {
+        background-color: var(--text-mint) !important; /* Mint Background */
+        color: var(--text-dark) !important;            /* Dark Blue Text/Emoji */
+        border: none !important;
+        border-radius: 10px !important;
+        
+        /* TYPOGRAPHY */
+        font-size: 24px !important; /* Large Emoji size */
+        font-weight: bold !important;
+        
+        /* SIZING - SMALL AND COMPACT */
+        height: auto !important;
+        width: auto !important;
+        padding: 10px 20px !important;
+        min-height: 0px !important; /* Override the big height */
+        
+        transition: transform 0.2s ease !important;
+    }
     
+    div.stButton > button[kind="secondary"]:hover {
+        transform: scale(1.1) !important; /* Slight grow effect */
+        background-color: #fff !important; /* White on hover for feedback */
+    }
+
     /* Headings */
     h1, h2, h3 {
         color: var(--text-mint) !important;
         font-family: 'Helvetica', sans-serif;
+    }
+    
+    /* Text styling */
+    p, li {
+        color: #e0e1dd;
+        font-size: 1.1rem;
     }
 
     /* Hide default menu */
@@ -83,33 +118,31 @@ lorem_short = "Short placeholder text to describe this section briefly."
 # --- 4. PAGE FUNCTIONS ---
 
 def home_page():
-    # Spacer to lower the content
     st.markdown("<br><br>", unsafe_allow_html=True)
-    
     st.markdown("<h1 style='text-align: center; font-size: 4rem; margin-bottom: 20px;'>ROBIN</h1>", unsafe_allow_html=True)
-    
-    # Another spacer to push boxes down further
     st.markdown("<br>", unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
         label = f"GIVE US YOUR IDEA\n\n{lorem_short}"
-        if st.button(label):
+        # We add type="primary" to apply the BIG BOX style
+        if st.button(label, type="primary"):
             navigate_to('ideas')
             
     with col2:
         label = f"HOW ROBIN WORKS\n\n{lorem_short}"
-        if st.button(label):
+        if st.button(label, type="primary"):
             navigate_to('how_it_works')
             
     with col3:
         label = f"KEEP TRACK OF SUCCESSFUL IDEAS\n\n{lorem_short}"
-        if st.button(label):
+        if st.button(label, type="primary"):
             navigate_to('success')
 
 def ideas_page():
-    if st.button("← BACK", key="back_btn"):
+    # Back button is type="secondary" (default), so it gets the BAT style
+    if st.button("🦇", type="secondary"):
         navigate_to('home')
         
     st.markdown("---")
@@ -120,16 +153,18 @@ def ideas_page():
     
     with mid1:
         label = f"I NEED FINANCIAL SUPPORT\n\n{lorem_short}"
-        if st.button(label):
+        # These are big boxes, so type="primary"
+        if st.button(label, type="primary"):
             st.toast("Financial Support Selected")
             
     with mid2:
         label = f"I NEED A HELPING HAND\n\n{lorem_short}"
-        if st.button(label):
+        # These are big boxes, so type="primary"
+        if st.button(label, type="primary"):
             st.toast("Volunteer Support Selected")
 
 def how_it_works_page():
-    if st.button("← BACK", key="back_btn"):
+    if st.button("🦇", type="secondary"):
         navigate_to('home')
     
     st.markdown("---")
@@ -151,7 +186,7 @@ def how_it_works_page():
         st.markdown("<br>", unsafe_allow_html=True)
 
 def success_page():
-    if st.button("← BACK", key="back_btn"):
+    if st.button("🦇", type="secondary"):
         navigate_to('home')
         
     st.markdown("<br><br>", unsafe_allow_html=True)

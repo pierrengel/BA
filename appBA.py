@@ -17,10 +17,9 @@ def navigate_to(page_name):
 def toggle_selection(key):
     st.session_state.selections[key] = not st.session_state.selections.get(key, False)
 
-# --- 2. CUSTOM CSS ---
+# --- 2. CUSTOM CSS (STRICT SCOPING) ---
 st.markdown("""
     <style>
-    /* Global Variables */
     :root {
         --app-bg: #1b263b;
         --box-bg: #0d1b2a;
@@ -33,146 +32,103 @@ st.markdown("""
         color: var(--text-mint);
     }
 
-    /* =========================================
-       1. GLOBAL BIG BOXES (Home/Ideas)
-       Target: Any 'primary' button. 
-       Effect: Makes it HUGE (50vh) and Mint on Hover.
-       ========================================= */
-    div.stButton > button[kind="primary"] {
+    /* ============================================================
+       1. BASE BUTTON STYLES (Applies to ALL buttons)
+       Colors Only - No Sizes!
+       ============================================================ */
+    
+    /* DEFAULT STATE (Secondary) -> Dark Blue Box, Mint Text */
+    div.stButton > button[kind="secondary"] {
         background-color: var(--box-bg) !important;
         color: var(--text-mint) !important;
-        border: none !important;
+        border: 2px solid var(--box-bg) !important; /* Invisible border */
         border-radius: 15px !important;
-        font-size: 22px !important; 
-        text-align: left !important;
-        white-space: pre-wrap !important;
-        font-family: 'Helvetica', sans-serif !important;
-        width: 100% !important;
-        min-height: 50vh !important; /* THE GIANT HEIGHT */
-        padding: 40px !important;
-        margin-top: 20px !important;
         transition: all 0.2s ease-in-out !important;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
     }
 
-    div.stButton > button[kind="primary"]:hover {
-        background-color: var(--text-mint) !important; 
-        color: var(--text-dark) !important;            
-        transform: translateY(-5px) !important;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.4) !important;
-    }
-    
-    div.stButton > button[kind="primary"]:hover p {
-        color: var(--text-dark) !important;
-    }
-
-    /* =========================================
-       2. BACK BUTTON (The Bat)
-       Target: Any 'secondary' button.
-       ========================================= */
-    div.stButton > button[kind="secondary"] {
-        background-color: var(--text-mint) !important; 
-        border: none !important;
-        border-radius: 12px !important;
-        color: transparent !important;  
-        text-shadow: 0 0 0 var(--text-dark) !important; 
-        font-size: 50px !important;
-        line-height: 50px !important;
-        height: auto !important;
-        width: auto !important;
-        padding: 10px 20px !important;
-        min-height: 0px !important;
-        transition: transform 0.2s ease !important;
-    }
-    
-    div.stButton > button[kind="secondary"]:hover {
-        transform: scale(1.1) !important; 
-        background-color: #ffffff !important; 
-    }
-
-    /* =========================================
-       3. SUBMIT BUTTON (Tertiary)
-       ========================================= */
-    div.stButton > button[kind="tertiary"] {
+    /* SELECTED STATE (Primary) -> Mint Box, Dark Blue Text */
+    div.stButton > button[kind="primary"] {
         background-color: var(--text-mint) !important;
         color: var(--text-dark) !important;
-        border: none !important;
-        border-radius: 10px !important;
-        font-size: 20px !important;
-        font-weight: bold !important;
-        width: 100% !important;
-        height: auto !important;
-        padding: 15px !important;
-        min-height: 0px !important;
-        margin-top: 20px !important;
-    }
-    
-    div.stButton > button[kind="tertiary"]:hover {
-        background-color: #ffffff !important;
-        transform: scale(1.01) !important;
+        border: 2px solid var(--text-mint) !important;
+        border-radius: 15px !important;
     }
 
-    /* =========================================
-       4. SMALL SELECTION GRID OVERRIDES
-       This targets buttons ONLY when they are inside the 'small-grid' div.
-       This overrides the global settings above.
-       ========================================= */
+    /* HOVER STATE (For Secondary) -> Turns Mint like Primary */
+    div.stButton > button[kind="secondary"]:hover {
+        background-color: var(--text-mint) !important;
+        color: var(--text-dark) !important;
+        transform: translateY(-2px);
+    }
     
-    /* Reset size for ALL buttons in the grid */
-    div.small-grid div.stButton > button {
-        min-height: 0px !important;  /* KILL THE GIANT HEIGHT */
+    /* Text color override on hover */
+    div.stButton > button[kind="secondary"]:hover p {
+        color: var(--text-dark) !important;
+    }
+
+    /* ============================================================
+       2. SCOPED: BIG CARDS (.big-card)
+       Only these buttons get the 50vh height.
+       ============================================================ */
+    div.big-card div.stButton > button {
+        min-height: 50vh !important;
+        width: 100% !important;
+        font-size: 24px !important;
+        text-align: left !important;
+        padding: 40px !important;
+        white-space: pre-wrap !important;
+    }
+
+    /* ============================================================
+       3. SCOPED: SMALL CARDS (.small-card)
+       These buttons stay small and grid-like.
+       ============================================================ */
+    div.small-card div.stButton > button {
+        min-height: auto !important;
         height: auto !important;
-        padding: 15px !important;
+        width: 100% !important;
         font-size: 16px !important;
         text-align: center !important;
-        width: 100% !important;
+        padding: 15px 10px !important;
         margin-top: 5px !important;
-        box-shadow: none !important;
     }
 
-    /* UNSELECTED (Dark Blue) */
-    /* We reuse 'secondary' type but override the Bat style */
-    div.small-grid div.stButton > button[kind="secondary"] {
-        background-color: var(--box-bg) !important; 
-        color: var(--text-mint) !important;         
-        border: 2px solid var(--text-mint) !important;
-        text-shadow: none !important; /* Remove Bat Shadow */
-        border-radius: 8px !important;
-    }
-
-    /* SELECTED (Mint) */
-    /* We reuse 'primary' type but override the Giant Box style */
-    div.small-grid div.stButton > button[kind="primary"] {
-        background-color: var(--text-mint) !important; 
-        color: var(--text-dark) !important;            
-        border: 2px solid var(--text-mint) !important;
-        border-radius: 8px !important;
-    }
-
-    div.small-grid div.stButton > button:hover {
-        transform: scale(1.02) !important;
-        border-color: #ffffff !important;
-    }
-
-    /* Headings */
-    h1, h2, h3 {
-        color: var(--text-mint) !important;
-        font-family: 'Helvetica', sans-serif;
+    /* ============================================================
+       4. SCOPED: BAT NAVIGATION (.bat-nav)
+       Specific styles for the back button
+       ============================================================ */
+    div.bat-nav div.stButton > button {
+        background-color: var(--text-mint) !important; /* Mint Bg */
+        width: auto !important;
+        height: auto !important;
+        min-height: 0px !important;
+        padding: 5px 20px !important;
+        
+        /* Black Bat Trick */
+        color: transparent !important;
+        text-shadow: 0 0 0 var(--text-dark) !important; /* Dark Blue Bat */
+        font-size: 40px !important;
+        line-height: 40px !important;
     }
     
-    /* Inputs */
+    div.bat-nav div.stButton > button:hover {
+        background-color: #ffffff !important;
+        transform: scale(1.1) !important;
+    }
+
+    /* ============================================================
+       5. GENERAL UI (Inputs, Headings)
+       ============================================================ */
+    h1, h2, h3 { color: var(--text-mint) !important; font-family: 'Helvetica', sans-serif; }
+    
     .stTextInput > div > div > input, .stTextArea > div > div > textarea {
         background-color: var(--box-bg);
         color: var(--text-mint);
         border: 2px solid var(--text-mint);
         border-radius: 10px;
     }
-    .stTextArea > div > div > textarea {
-        min-height: 200px;
-        font-size: 18px;
-    }
+    .stTextArea > div > div > textarea { min-height: 200px; font-size: 18px; }
     
-    /* Expander */
     .streamlit-expanderHeader {
         background-color: var(--box-bg);
         color: var(--text-mint);
@@ -182,19 +138,29 @@ st.markdown("""
 
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    
     </style>
 """, unsafe_allow_html=True)
 
 # --- 3. HELPER FUNCTIONS ---
 
+def render_big_button(label, key):
+    """Renders a button inside the 'big-card' wrapper."""
+    st.markdown('<div class="big-card">', unsafe_allow_html=True)
+    # We use 'secondary' as default so it's Dark Blue, turns Mint on hover.
+    clicked = st.button(label, key=key, type="secondary")
+    st.markdown('</div>', unsafe_allow_html=True)
+    return clicked
+
+def render_bat_button(key):
+    """Renders the back button inside 'bat-nav' wrapper."""
+    st.markdown('<div class="bat-nav">', unsafe_allow_html=True)
+    clicked = st.button("🦇", key=key)
+    st.markdown('</div>', unsafe_allow_html=True)
+    return clicked
+
 def create_selection_grid(options, category_key):
-    """
-    Creates a grid of clickable toggle buttons wrapped in 'small-grid'
-    to prevent them from becoming giant.
-    """
-    # WRAPPER: This div class triggers the CSS overrides above
-    st.markdown('<div class="small-grid">', unsafe_allow_html=True)
+    """Renders small toggle buttons inside 'small-card' wrapper."""
+    st.markdown('<div class="small-card">', unsafe_allow_html=True)
     
     cols_per_row = 4
     rows = [options[i:i + cols_per_row] for i in range(0, len(options), cols_per_row)]
@@ -205,8 +171,9 @@ def create_selection_grid(options, category_key):
             full_key = f"{category_key}_{option}"
             is_selected = st.session_state.selections.get(full_key, False)
             
-            # Logic: If selected, be 'primary' (Mint). If not, be 'secondary' (Dark).
-            # The CSS 'small-grid' class ensures they stay small regardless of type.
+            # Logic: 
+            # Not Selected -> 'secondary' (Dark Blue)
+            # Selected -> 'primary' (Mint)
             btn_type = "primary" if is_selected else "secondary"
             
             with cols[idx]:
@@ -227,22 +194,17 @@ def home_page():
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        label = f"GIVE US YOUR IDEA\n\n{lorem_short}"
-        if st.button(label, type="primary"):
+        if render_big_button(f"GIVE US YOUR IDEA\n\n{lorem_short}", "home_1"):
             navigate_to('ideas')
-            
     with col2:
-        label = f"HOW ROBIN WORKS\n\n{lorem_short}"
-        if st.button(label, type="primary"):
+        if render_big_button(f"HOW ROBIN WORKS\n\n{lorem_short}", "home_2"):
             navigate_to('how_it_works')
-            
     with col3:
-        label = f"KEEP TRACK OF SUCCESSFUL IDEAS\n\n{lorem_short}"
-        if st.button(label, type="primary"):
+        if render_big_button(f"KEEP TRACK OF SUCCESSFUL IDEAS\n\n{lorem_short}", "home_3"):
             navigate_to('success')
 
 def ideas_page():
-    if st.button("🦇", type="secondary"):
+    if render_bat_button("back_ideas"):
         navigate_to('home')
         
     st.markdown("---")
@@ -252,17 +214,14 @@ def ideas_page():
     _, mid1, mid2, _ = st.columns([0.5, 2, 2, 0.5])
     
     with mid1:
-        label = f"I NEED FINANCIAL SUPPORT\n\n{lorem_short}"
-        if st.button(label, type="primary"):
+        if render_big_button(f"I NEED FINANCIAL SUPPORT\n\n{lorem_short}", "idea_money"):
             st.toast("Financial Support Selected")
-            
     with mid2:
-        label = f"I NEED A HELPING HAND\n\n{lorem_short}"
-        if st.button(label, type="primary"):
+        if render_big_button(f"I NEED A HELPING HAND\n\n{lorem_short}", "idea_help"):
             navigate_to('helping_hand')
 
 def helping_hand_page():
-    if st.button("🦇", type="secondary"):
+    if render_bat_button("back_help"):
         navigate_to('ideas')
     
     st.markdown("---")
@@ -301,11 +260,15 @@ def helping_hand_page():
             create_selection_grid(["Yes", "No"], "meeting")
 
     st.markdown("<br><br>", unsafe_allow_html=True)
-    if st.button("Submit Request", type="tertiary"):
+    
+    # Submit button - using a manual wrapper for the 'slim' look
+    st.markdown('<div class="small-card">', unsafe_allow_html=True)
+    if st.button("Submit Request", type="primary", use_container_width=True):
         st.toast("Request Submitted Successfully!")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def how_it_works_page():
-    if st.button("🦇", type="secondary"):
+    if render_bat_button("back_how"):
         navigate_to('home')
     
     st.markdown("---")
@@ -316,7 +279,6 @@ def how_it_works_page():
         {"title": "2. REVIEW", "sub": "Feasibility check"},
         {"title": "3. LAUNCH", "sub": "Go to market"}
     ]
-    
     gibberish = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     
     for s in sections:
@@ -327,14 +289,13 @@ def how_it_works_page():
         st.markdown("<br>", unsafe_allow_html=True)
 
 def success_page():
-    if st.button("🦇", type="secondary"):
+    if render_bat_button("back_success"):
         navigate_to('home')
         
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("<h1 style='text-align: center; font-size: 5rem;'>OUR SUCCESS STORIES</h1>", unsafe_allow_html=True)
 
 # --- 5. MAIN CONTROLLER ---
-
 if st.session_state.page == 'home':
     home_page()
 elif st.session_state.page == 'ideas':

@@ -35,9 +35,9 @@ st.markdown("""
 
     /* =========================================
        1. THE BIG BOXES (Home & Ideas Page)
-       Targeting buttons inside the .big-box wrapper
+       Selector: Any button inside a div with class "big-box"
        ========================================= */
-    div.big-box > div.stButton > button {
+    div.big-box button {
         background-color: var(--box-bg) !important;
         color: var(--text-mint) !important;
         border: none !important;
@@ -51,28 +51,27 @@ st.markdown("""
         width: 100% !important;
         height: 50vh !important;  /* FORCE HUGE HEIGHT */
         padding: 40px !important;
-        margin-top: 20px !important;
+        margin-top: 10px !important;
         
         box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
         transition: all 0.2s ease-in-out !important;
     }
 
-    div.big-box > div.stButton > button:hover {
+    div.big-box button:hover {
         background-color: var(--text-mint) !important; 
         color: var(--text-dark) !important;            
         transform: translateY(-5px) !important;
     }
     
-    /* Force text inside button to change color on hover */
-    div.big-box > div.stButton > button:hover p {
+    div.big-box button:hover p {
         color: var(--text-dark) !important;
     }
 
     /* =========================================
        2. THE BAT BUTTON (Navigation)
-       Targeting buttons inside the .nav-btn wrapper
+       Selector: Any button inside a div with class "nav-btn"
        ========================================= */
-    div.nav-btn > div.stButton > button {
+    div.nav-btn button {
         background-color: var(--text-mint) !important; /* MINT BACKGROUND */
         border: none !important;
         border-radius: 12px !important;
@@ -86,42 +85,40 @@ st.markdown("""
         
         height: auto !important;
         width: auto !important;
-        padding: 5px 15px !important;
+        padding: 0px 15px !important;
         min-height: 0px !important;
     }
     
-    div.nav-btn > div.stButton > button:hover {
+    div.nav-btn button:hover {
         transform: scale(1.1) !important; 
-        background-color: #ffffff !important; /* White on hover */
+        background-color: #ffffff !important; 
+        text-shadow: 0 0 0 #000000 !important;
     }
 
     /* =========================================
        3. SELECTION GRID BOXES (Helping Hand Page)
-       Targeting buttons inside the .option-box wrapper
+       Selector: Any button inside a div with class "option-box"
        ========================================= */
-    
-    /* Unselected State */
-    div.option-box > div.stButton > button {
+    div.option-box button {
         background-color: var(--box-bg) !important;
         color: var(--text-mint) !important;
         border: 2px solid var(--text-mint) !important;
         border-radius: 8px !important;
         font-size: 16px !important;
         font-weight: 600 !important;
-        min-height: 60px !important; /* Fixed small height */
+        min-height: 60px !important; 
         height: auto !important;
         width: 100% !important;
         transition: all 0.1s ease !important;
     }
     
-    /* Hover State */
-    div.option-box > div.stButton > button:hover {
+    div.option-box button:hover {
         transform: scale(1.02) !important;
         border-color: #ffffff !important;
     }
 
-    /* Selected State (We use type="primary" to mark selected) */
-    div.option-box > div.stButton > button[kind="primary"] {
+    /* Selected State (Primary Type) */
+    div.option-box button[kind="primary"] {
         background-color: var(--text-mint) !important;
         color: var(--text-dark) !important;
         border: 2px solid var(--text-mint) !important;
@@ -130,7 +127,7 @@ st.markdown("""
     /* =========================================
        4. SUBMIT BUTTON
        ========================================= */
-    div.submit-btn > div.stButton > button {
+    div.submit-btn button {
         background-color: var(--text-mint) !important;
         color: var(--text-dark) !important;
         border: none !important;
@@ -139,10 +136,9 @@ st.markdown("""
         font-weight: bold !important;
         width: 100% !important;
         padding: 12px !important;
-        min-height: 0px !important;
     }
     
-    div.submit-btn > div.stButton > button:hover {
+    div.submit-btn button:hover {
         background-color: #ffffff !important;
         transform: scale(1.01) !important;
     }
@@ -163,7 +159,6 @@ st.markdown("""
         border-radius: 8px;
     }
 
-    /* Hide default menu */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     
@@ -173,12 +168,11 @@ st.markdown("""
 # --- 3. HELPER FUNCTIONS ---
 
 def create_selection_grid(options, category_name):
-    # Wrap the entire grid in the "option-box" class to keep them small
-    st.markdown('<div class="option-box">', unsafe_allow_html=True)
-    
     cols_per_row = 4
     rows = [options[i:i + cols_per_row] for i in range(0, len(options), cols_per_row)]
 
+    # We wrap the whole grid block
+    st.markdown('<div class="option-box">', unsafe_allow_html=True)
     for row in rows:
         cols = st.columns(cols_per_row)
         for idx, option in enumerate(row):
@@ -187,11 +181,9 @@ def create_selection_grid(options, category_name):
             btn_type = "primary" if is_selected else "secondary"
             
             with cols[idx]:
-                # The button itself
                 if st.button(option, key=option_key, type=btn_type):
                     toggle_selection(option_key)
                     st.rerun()
-                    
     st.markdown('</div>', unsafe_allow_html=True)
 
 # --- 4. PAGE FUNCTIONS ---
@@ -203,28 +195,29 @@ def home_page():
     
     col1, col2, col3 = st.columns(3)
     
-    # WRAPPER FOR BIG BOXES
-    st.markdown('<div class="big-box">', unsafe_allow_html=True)
-    
+    # CRITICAL FIX: The div wrapper must be INSIDE the column
     with col1:
+        st.markdown('<div class="big-box">', unsafe_allow_html=True)
         label = f"GIVE US YOUR IDEA\n\nShort placeholder text."
         if st.button(label, key="home_1"):
             navigate_to('ideas')
+        st.markdown('</div>', unsafe_allow_html=True)
             
     with col2:
+        st.markdown('<div class="big-box">', unsafe_allow_html=True)
         label = f"HOW ROBIN WORKS\n\nShort placeholder text."
         if st.button(label, key="home_2"):
             navigate_to('how_it_works')
+        st.markdown('</div>', unsafe_allow_html=True)
             
     with col3:
+        st.markdown('<div class="big-box">', unsafe_allow_html=True)
         label = f"KEEP TRACK OF SUCCESSFUL IDEAS\n\nShort placeholder text."
         if st.button(label, key="home_3"):
             navigate_to('success')
-            
-    st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 def ideas_page():
-    # WRAPPER FOR BAT BUTTON
     st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
     if st.button("🦇", key="back_ideas"):
         navigate_to('home')
@@ -236,21 +229,22 @@ def ideas_page():
     
     _, mid1, mid2, _ = st.columns([0.5, 2, 2, 0.5])
     
-    # WRAPPER FOR BIG BOXES
-    st.markdown('<div class="big-box">', unsafe_allow_html=True)
+    # CRITICAL FIX: Wrapper inside the columns
     with mid1:
+        st.markdown('<div class="big-box">', unsafe_allow_html=True)
         label = f"I NEED FINANCIAL SUPPORT\n\nShort placeholder text."
         if st.button(label, key="idea_money"):
             st.toast("Financial Support Selected")
+        st.markdown('</div>', unsafe_allow_html=True)
             
     with mid2:
+        st.markdown('<div class="big-box">', unsafe_allow_html=True)
         label = f"I NEED A HELPING HAND\n\nShort placeholder text."
         if st.button(label, key="idea_help"):
             navigate_to('helping_hand')
-    st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 def helping_hand_page():
-    # WRAPPER FOR BAT BUTTON
     st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
     if st.button("🦇", key="back_help"):
         navigate_to('ideas')
@@ -293,14 +287,12 @@ def helping_hand_page():
 
     st.markdown("<br><br>", unsafe_allow_html=True)
     
-    # WRAPPER FOR SUBMIT BUTTON
     st.markdown('<div class="submit-btn">', unsafe_allow_html=True)
     if st.button("Submit Request"):
         st.toast("Request Submitted Successfully!")
     st.markdown('</div>', unsafe_allow_html=True)
 
 def how_it_works_page():
-    # WRAPPER FOR BAT BUTTON
     st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
     if st.button("🦇", key="back_how"):
         navigate_to('home')
@@ -325,7 +317,6 @@ def how_it_works_page():
         st.markdown("<br>", unsafe_allow_html=True)
 
 def success_page():
-    # WRAPPER FOR BAT BUTTON
     st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
     if st.button("🦇", key="back_success"):
         navigate_to('home')

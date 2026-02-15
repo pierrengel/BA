@@ -135,4 +135,212 @@ st.markdown("""
     /* We use 'secondary' logic here but override appearance */
     div.small-grid button[kind="secondary"] {
         background-color: var(--box-bg) !important; /* Dark Blue */
+        color: var(--text-mint) !important;         /* Mint Text */
+        border: 2px solid var(--text-mint) !important;
+        text-shadow: none !important; /* Remove Bat Shadow */
+        border-radius: 8px !important;
+    }
+
+    /* SELECTED STATE (Inside Grid) */
+    /* We use 'primary' logic here but override appearance */
+    div.small-grid button[kind="primary"] {
+        background-color: var(--text-mint) !important; /* Mint Background */
+        color: var(--text-dark) !important;            /* Dark Blue Text */
+        border: 2px solid var(--text-mint) !important;
+        border-radius: 8px !important;
+    }
+
+    div.small-grid button:hover {
+        transform: scale(1.02) !important;
+        border-color: #ffffff !important;
+    }
+
+    /* Headings */
+    h1, h2, h3 {
         color: var(--text-mint) !important;
+        font-family: 'Helvetica', sans-serif;
+    }
+    
+    /* Inputs */
+    .stTextInput > div > div > input, .stTextArea > div > div > textarea {
+        background-color: var(--box-bg);
+        color: var(--text-mint);
+        border: 2px solid var(--text-mint);
+        border-radius: 10px;
+    }
+    .stTextArea > div > div > textarea {
+        min-height: 200px;
+        font-size: 18px;
+    }
+    
+    /* Expander */
+    .streamlit-expanderHeader {
+        background-color: var(--box-bg);
+        color: var(--text-mint);
+        border: 1px solid var(--text-mint);
+        border-radius: 8px;
+    }
+
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    
+    </style>
+""", unsafe_allow_html=True)
+
+# --- 3. HELPER FUNCTIONS ---
+
+def create_selection_grid(options, category_key):
+    """
+    Creates a grid of clickable toggle buttons wrapped in 'small-grid'
+    to prevent them from becoming giant.
+    """
+    st.markdown('<div class="small-grid">', unsafe_allow_html=True)
+    
+    cols_per_row = 4
+    rows = [options[i:i + cols_per_row] for i in range(0, len(options), cols_per_row)]
+
+    for row in rows:
+        cols = st.columns(cols_per_row)
+        for idx, option in enumerate(row):
+            full_key = f"{category_key}_{option}"
+            is_selected = st.session_state.selections.get(full_key, False)
+            
+            # Primary = Selected (Mint), Secondary = Unselected (Dark Blue)
+            btn_type = "primary" if is_selected else "secondary"
+            
+            with cols[idx]:
+                if st.button(option, key=full_key, type=btn_type):
+                    toggle_selection(full_key)
+                    st.rerun()
+                    
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# --- 4. PAGE FUNCTIONS ---
+lorem_short = "Short placeholder text to describe this section briefly."
+
+def home_page():
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; font-size: 4rem; margin-bottom: 20px;'>ROBIN</h1>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        label = f"GIVE US YOUR IDEA\n\n{lorem_short}"
+        if st.button(label, type="primary"):
+            navigate_to('ideas')
+            
+    with col2:
+        label = f"HOW ROBIN WORKS\n\n{lorem_short}"
+        if st.button(label, type="primary"):
+            navigate_to('how_it_works')
+            
+    with col3:
+        label = f"KEEP TRACK OF SUCCESSFUL IDEAS\n\n{lorem_short}"
+        if st.button(label, type="primary"):
+            navigate_to('success')
+
+def ideas_page():
+    if st.button("🦇", type="secondary"):
+        navigate_to('home')
+        
+    st.markdown("---")
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; font-size: 3rem; margin-bottom: 60px;'>HOW CAN WE HELP YOU WITH YOUR PROJECT?</h1>", unsafe_allow_html=True)
+    
+    _, mid1, mid2, _ = st.columns([0.5, 2, 2, 0.5])
+    
+    with mid1:
+        label = f"I NEED FINANCIAL SUPPORT\n\n{lorem_short}"
+        if st.button(label, type="primary"):
+            st.toast("Financial Support Selected")
+            
+    with mid2:
+        label = f"I NEED A HELPING HAND\n\n{lorem_short}"
+        if st.button(label, type="primary"):
+            navigate_to('helping_hand')
+
+def helping_hand_page():
+    if st.button("🦇", type="secondary"):
+        navigate_to('ideas')
+    
+    st.markdown("---")
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; margin-bottom: 40px;'>Describe your project</h1>", unsafe_allow_html=True)
+
+    placeholders = ["Let's hear your idea!", "Let's find you your best help!", "Let's find you your partner!"]
+    selected_placeholder = random.choice(placeholders)
+
+    assisted_mode = st.toggle("Assisted Mode")
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    if not assisted_mode:
+        st.text_area("Your Idea", placeholder=selected_placeholder, label_visibility="collapsed")
+    else:
+        # 1. Project Type
+        with st.expander("1. What kind of project is it?", expanded=True):
+            options = ["Quick fix", "Big idea", "Long Term", "Community", "Tech", "Art", "Else"]
+            create_selection_grid(options, "type")
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # 2. Resources
+        with st.expander("2. What resources do you need?", expanded=True):
+            resources = [
+                "Hammer", "Workspace", "Drill", "3D Printer", 
+                "Paint", "Wood", "Metal", "Soldering Iron", 
+                "Sewing Machine", "Laptop", "Vehicle", "Ladder"
+            ]
+            create_selection_grid(resources, "resource")
+            
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # 3. Meeting Preference
+        with st.expander("3. Do you want to meet face to face?", expanded=True):
+            create_selection_grid(["Yes", "No"], "meeting")
+
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    if st.button("Submit Request", type="tertiary"):
+        st.toast("Request Submitted Successfully!")
+
+def how_it_works_page():
+    if st.button("🦇", type="secondary"):
+        navigate_to('home')
+    
+    st.markdown("---")
+    st.title("HOW ROBIN WORKS")
+    
+    sections = [
+        {"title": "1. SUBMISSION", "sub": "Initial concept phase"},
+        {"title": "2. REVIEW", "sub": "Feasibility check"},
+        {"title": "3. LAUNCH", "sub": "Go to market"}
+    ]
+    
+    gibberish = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+    
+    for s in sections:
+        st.subheader(s["title"])
+        st.markdown(f"*{s['sub']}*")
+        with st.expander("Read details"):
+            st.write(gibberish)
+        st.markdown("<br>", unsafe_allow_html=True)
+
+def success_page():
+    if st.button("🦇", type="secondary"):
+        navigate_to('home')
+        
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; font-size: 5rem;'>OUR SUCCESS STORIES</h1>", unsafe_allow_html=True)
+
+# --- 5. MAIN CONTROLLER ---
+
+if st.session_state.page == 'home':
+    home_page()
+elif st.session_state.page == 'ideas':
+    ideas_page()
+elif st.session_state.page == 'helping_hand':
+    helping_hand_page()
+elif st.session_state.page == 'how_it_works':
+    how_it_works_page()
+elif st.session_state.page == 'success':
+    success_page()

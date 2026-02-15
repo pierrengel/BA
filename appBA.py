@@ -4,11 +4,9 @@ import random
 # --- 1. CONFIGURATION & STATE MANAGEMENT ---
 st.set_page_config(page_title="ROBIN", layout="wide", page_icon="🐦")
 
-# Initialize session state for navigation
 if 'page' not in st.session_state:
     st.session_state.page = 'home'
 
-# Initialize session state for selections (to remember what boxes are ticked)
 if 'selections' not in st.session_state:
     st.session_state.selections = {}
 
@@ -17,9 +15,7 @@ def navigate_to(page_name):
     st.rerun()
 
 def toggle_selection(key):
-    # Toggle the boolean value for a specific selection box
-    current_val = st.session_state.selections.get(key, False)
-    st.session_state.selections[key] = not current_val
+    st.session_state.selections[key] = not st.session_state.selections.get(key, False)
 
 # --- 2. CUSTOM CSS ---
 st.markdown("""
@@ -38,86 +34,103 @@ st.markdown("""
     }
 
     /* =========================================
-       STYLE CLASS: BIG HOME BOXES (.big-box)
+       1. THE BIG BOXES (Home & Ideas Page)
+       Targeting buttons inside the .big-box wrapper
        ========================================= */
-    .big-box button {
+    div.big-box > div.stButton > button {
         background-color: var(--box-bg) !important;
         color: var(--text-mint) !important;
         border: none !important;
         border-radius: 15px !important;
+        
         font-size: 22px !important; 
         text-align: left !important;
         white-space: pre-wrap !important;
         font-family: 'Helvetica', sans-serif !important;
+        
         width: 100% !important;
-        min-height: 50vh !important;
+        height: 50vh !important;  /* FORCE HUGE HEIGHT */
         padding: 40px !important;
         margin-top: 20px !important;
+        
         box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
         transition: all 0.2s ease-in-out !important;
     }
-    .big-box button:hover {
+
+    div.big-box > div.stButton > button:hover {
         background-color: var(--text-mint) !important; 
         color: var(--text-dark) !important;            
         transform: translateY(-5px) !important;
     }
-    .big-box button:hover p {
+    
+    /* Force text inside button to change color on hover */
+    div.big-box > div.stButton > button:hover p {
         color: var(--text-dark) !important;
     }
 
     /* =========================================
-       STYLE CLASS: SELECTION BOXES (.option-box)
-       These are the small toggle boxes in Assisted Mode
+       2. THE BAT BUTTON (Navigation)
+       Targeting buttons inside the .nav-btn wrapper
+       ========================================= */
+    div.nav-btn > div.stButton > button {
+        background-color: var(--text-mint) !important; /* MINT BACKGROUND */
+        border: none !important;
+        border-radius: 12px !important;
+        
+        /* BLACK BAT TRICK */
+        color: transparent !important;  
+        text-shadow: 0 0 0 var(--text-dark) !important; /* Dark Blue Silhouette */
+        
+        font-size: 40px !important;
+        line-height: 40px !important;
+        
+        height: auto !important;
+        width: auto !important;
+        padding: 5px 15px !important;
+        min-height: 0px !important;
+    }
+    
+    div.nav-btn > div.stButton > button:hover {
+        transform: scale(1.1) !important; 
+        background-color: #ffffff !important; /* White on hover */
+    }
+
+    /* =========================================
+       3. SELECTION GRID BOXES (Helping Hand Page)
+       Targeting buttons inside the .option-box wrapper
        ========================================= */
     
-    /* UNSELECTED STATE (Default Button) */
-    .option-box button {
+    /* Unselected State */
+    div.option-box > div.stButton > button {
         background-color: var(--box-bg) !important;
         color: var(--text-mint) !important;
         border: 2px solid var(--text-mint) !important;
         border-radius: 8px !important;
         font-size: 16px !important;
         font-weight: 600 !important;
+        min-height: 60px !important; /* Fixed small height */
         height: auto !important;
-        min-height: 60px !important; /* Fixed height for uniformity */
         width: 100% !important;
         transition: all 0.1s ease !important;
     }
     
-    /* SELECTED STATE (We use type="primary" for selected) */
-    .option-box button[kind="primary"] {
+    /* Hover State */
+    div.option-box > div.stButton > button:hover {
+        transform: scale(1.02) !important;
+        border-color: #ffffff !important;
+    }
+
+    /* Selected State (We use type="primary" to mark selected) */
+    div.option-box > div.stButton > button[kind="primary"] {
         background-color: var(--text-mint) !important;
         color: var(--text-dark) !important;
         border: 2px solid var(--text-mint) !important;
     }
 
-    .option-box button:hover {
-        transform: scale(1.02) !important;
-        border-color: #ffffff !important;
-    }
-
     /* =========================================
-       STYLE CLASS: NAVIGATION BUTTONS (.nav-btn)
-       The "Bat" back button
+       4. SUBMIT BUTTON
        ========================================= */
-    .nav-btn button {
-        background-color: transparent !important; 
-        border: none !important;
-        color: transparent !important;  
-        text-shadow: 0 0 0 var(--text-dark) !important; 
-        font-size: 40px !important;
-        line-height: 40px !important;
-        padding: 0px 10px !important;
-    }
-    .nav-btn button:hover {
-        transform: scale(1.1) !important; 
-        text-shadow: 0 0 0 #ffffff !important; 
-    }
-
-    /* =========================================
-       STYLE CLASS: SUBMIT BUTTON (.submit-btn)
-       ========================================= */
-    .submit-btn button {
+    div.submit-btn > div.stButton > button {
         background-color: var(--text-mint) !important;
         color: var(--text-dark) !important;
         border: none !important;
@@ -126,13 +139,15 @@ st.markdown("""
         font-weight: bold !important;
         width: 100% !important;
         padding: 12px !important;
+        min-height: 0px !important;
     }
-    .submit-btn button:hover {
+    
+    div.submit-btn > div.stButton > button:hover {
         background-color: #ffffff !important;
         transform: scale(1.01) !important;
     }
 
-    /* GENERAL TEXT INPUT STYLING */
+    /* General Inputs */
     .stTextInput > div > div > input, .stTextArea > div > div > textarea {
         background-color: var(--box-bg);
         color: var(--text-mint);
@@ -140,7 +155,7 @@ st.markdown("""
         border-radius: 10px;
     }
     
-    /* EXPANDER STYLING */
+    /* Expander Styling */
     .streamlit-expanderHeader {
         background-color: var(--box-bg);
         color: var(--text-mint);
@@ -158,29 +173,21 @@ st.markdown("""
 # --- 3. HELPER FUNCTIONS ---
 
 def create_selection_grid(options, category_name):
-    """
-    Creates a grid of clickable boxes.
-    """
-    # Create columns for the grid (e.g., 4 boxes per row)
+    # Wrap the entire grid in the "option-box" class to keep them small
+    st.markdown('<div class="option-box">', unsafe_allow_html=True)
+    
     cols_per_row = 4
     rows = [options[i:i + cols_per_row] for i in range(0, len(options), cols_per_row)]
 
-    # Wrap in our custom CSS class
-    st.markdown('<div class="option-box">', unsafe_allow_html=True)
-    
     for row in rows:
         cols = st.columns(cols_per_row)
         for idx, option in enumerate(row):
-            # Unique key for this specific option
             option_key = f"{category_name}_{option}"
-            
-            # Check if currently selected
             is_selected = st.session_state.selections.get(option_key, False)
-            
-            # Determine visual state: 'primary' = Selected (Mint), 'secondary' = Unselected (Dark)
             btn_type = "primary" if is_selected else "secondary"
             
             with cols[idx]:
+                # The button itself
                 if st.button(option, key=option_key, type=btn_type):
                     toggle_selection(option_key)
                     st.rerun()
@@ -196,7 +203,7 @@ def home_page():
     
     col1, col2, col3 = st.columns(3)
     
-    # We use the div class "big-box" to style these specifically
+    # WRAPPER FOR BIG BOXES
     st.markdown('<div class="big-box">', unsafe_allow_html=True)
     
     with col1:
@@ -217,6 +224,7 @@ def home_page():
     st.markdown('</div>', unsafe_allow_html=True)
 
 def ideas_page():
+    # WRAPPER FOR BAT BUTTON
     st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
     if st.button("🦇", key="back_ideas"):
         navigate_to('home')
@@ -228,6 +236,7 @@ def ideas_page():
     
     _, mid1, mid2, _ = st.columns([0.5, 2, 2, 0.5])
     
+    # WRAPPER FOR BIG BOXES
     st.markdown('<div class="big-box">', unsafe_allow_html=True)
     with mid1:
         label = f"I NEED FINANCIAL SUPPORT\n\nShort placeholder text."
@@ -241,6 +250,7 @@ def ideas_page():
     st.markdown('</div>', unsafe_allow_html=True)
 
 def helping_hand_page():
+    # WRAPPER FOR BAT BUTTON
     st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
     if st.button("🦇", key="back_help"):
         navigate_to('ideas')
@@ -283,12 +293,14 @@ def helping_hand_page():
 
     st.markdown("<br><br>", unsafe_allow_html=True)
     
+    # WRAPPER FOR SUBMIT BUTTON
     st.markdown('<div class="submit-btn">', unsafe_allow_html=True)
     if st.button("Submit Request"):
         st.toast("Request Submitted Successfully!")
     st.markdown('</div>', unsafe_allow_html=True)
 
 def how_it_works_page():
+    # WRAPPER FOR BAT BUTTON
     st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
     if st.button("🦇", key="back_how"):
         navigate_to('home')
@@ -313,6 +325,7 @@ def how_it_works_page():
         st.markdown("<br>", unsafe_allow_html=True)
 
 def success_page():
+    # WRAPPER FOR BAT BUTTON
     st.markdown('<div class="nav-btn">', unsafe_allow_html=True)
     if st.button("🦇", key="back_success"):
         navigate_to('home')
